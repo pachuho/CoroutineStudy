@@ -8,7 +8,32 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        testAsync()
+        CoroutineScope(Dispatchers.Main).launch {
+            setLazy()
+        }
+    }
+
+    /**
+     * Lazy를 통해 비동기 작업이 생성 후 바로 실행되는걸 늦춘다.
+     * job 실행버
+     * 1. start(): 일시 중단 없이 실행
+     * 2. join(): job이 끝낼 때까지 코루틴을 대기시킨다.
+     *
+     */
+    suspend fun setLazy(){
+        val job = CoroutineScope(Dispatchers.IO).launch(start = CoroutineStart.LAZY) {
+            println("123")
+        }
+
+//        job.start()
+        job.join()
+    }
+
+    suspend fun exampleSuspend(){
+        val job = CoroutineScope(Dispatchers.IO).async {
+            (1..10000).sortedByDescending { it }
+        }
+        job.await()
     }
 
     /**
