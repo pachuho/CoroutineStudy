@@ -8,7 +8,31 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        addDispatcher()
+        testAsync()
+    }
+
+    /**
+     * async 예제 적용
+     * 작업이 작은 경우엔 job2가 실행되기전에 끝나버려서 일부러 크게 둠
+     */
+    private fun testAsync(){
+        val job3 = CoroutineScope(Dispatchers.IO).async {
+            println("job3, start!")
+            (1..10000).sortedByDescending { it }
+            println("job3, end!")
+        }
+
+        val job1 = CoroutineScope(Dispatchers.Main).launch {
+            println("job1, start!")
+
+            val job3Result = job3.await()
+            println("job1, end! $job3Result")
+        }
+
+        val job2 = CoroutineScope(Dispatchers.Main).launch {
+            println("job2, start!")
+            println("job2, end!")
+        }
     }
 
     /**
