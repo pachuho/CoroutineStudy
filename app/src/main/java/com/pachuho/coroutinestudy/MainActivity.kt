@@ -9,8 +9,34 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         CoroutineScope(Dispatchers.Main).launch {
-            setLazy()
+            cancelJob()
         }
+    }
+
+    /**
+     * job cancel
+     */
+    suspend fun cancelJob(){
+        val job = CoroutineScope(Dispatchers.IO).launch {
+            delay(3000L)
+            cancel("Job Cancelled, TimeOut", InterruptedException("Time Out"))
+        }
+
+        job.start()
+//
+//        job.cancel("Job Cancelled, TimeOut", InterruptedException("Time Out"))
+//        if(!job.isCompleted){
+//            println(job.getCancellationException())
+//        }
+
+        job.invokeOnCompletion { cause: Throwable? ->
+            println(job.isActive)
+            println(job.isCancelled)
+            println(job.isCompleted)
+            println(cause)
+        }
+
+        delay(5000L)
     }
 
     /**
